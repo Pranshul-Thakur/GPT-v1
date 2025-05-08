@@ -6,11 +6,11 @@ import random
 import pickle
 import argparse
 
-parser = argparse.ArgumentParser(description='This is a demonstration program') # Here we add an argument to the parser, specifying the expected type, a help message, etc.
+parser = argparse.ArgumentParser(description='Placeholder') # Here we add an argument to the parser, specifying the expected type, a help message, etc.
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 batch_size = 32
 block_size = 128
-max_iters = 200
+max_iters = 200 #increase to get a meaningful output
 learning_rate = 2e-5
 eval_iters = 100
 n_embd = 384
@@ -33,7 +33,7 @@ decode = lambda l: ''.join([int_to_string[i] for i in l])
 
 
 def get_random_chunk(split):
-    filename = "train_split.txt" if split == 'train' else "val_split.txt"
+    filename = "data.txt" # filename = "train_split.txt" if split == 'train' else "val_split.txt"
     with open(filename, 'rb') as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
             file_size = len(mm)
