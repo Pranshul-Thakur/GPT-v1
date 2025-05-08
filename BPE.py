@@ -26,7 +26,7 @@ with open("data.txt", 'r', encoding='utf-8') as f:
 vocab_size = len(chars)
 
 
-string_to_int = { ch:i for i,ch in enumerate(chars) }
+string_to_int = { ch:i for i,ch in enumerate(chars) }   
 int_to_string = { i:ch for i,ch in enumerate(chars) }
 encode = lambda s: [string_to_int[c] for c in s]
 decode = lambda l: ''.join([int_to_string[i] for i in l])
