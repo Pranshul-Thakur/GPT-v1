@@ -5,6 +5,17 @@ import mmap
 import random
 import pickle
 import argparse
+import mysql.connector
+
+db = mysql.connector.connect(
+    host="pranshul",
+    user="N3verl1vin",
+    password="123456"
+)
+
+cursor = db.cursor()
+
+cursor.execute("CREATE DATABASE mydatabase")
 
 parser = argparse.ArgumentParser(description='Placeholder') # Here we add an argument to the parser, specifying the expected type, a help message, etc.
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
