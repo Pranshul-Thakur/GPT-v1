@@ -7,15 +7,15 @@ import pickle
 import argparse
 import mysql.connector
 
-db = mysql.connector.connect(
-    host="pranshul",
-    user="N3verl1vin",
-    password="123456"
-)
+# db = mysql.connector.connect(
+#     host="127.0.0.1",
+#     user="N3verl1vin",
+#     password="123456"
+# )
 
-cursor = db.cursor()
+# cursor = db.cursor()
 
-cursor.execute("CREATE DATABASE mydatabase")
+# cursor.execute("CREATE DATABASE mydatabase")
 
 parser = argparse.ArgumentParser(description='Placeholder') # Here we add an argument to the parser, specifying the expected type, a help message, etc.
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -44,7 +44,7 @@ vocab_size = len(chars)
 
 string_to_int = { ch:i for i,ch in enumerate(chars) }   
 int_to_string = { i:ch for i,ch in enumerate(chars) }
-encode = lambda s: [string_to_int[c] for c in s]
+encode = lambda s: [string_to_int.get(c, 0) for c in s]  # unknown chars default to 0
 decode = lambda l: ''.join([int_to_string[i] for i in l])
 
 
@@ -70,6 +70,9 @@ def get_batch(split):
     x = torch.stack([data[i:i+block_size] for i in ix])
     y = torch.stack([data[i+1:i+block_size+1] for i in ix])
     x, y = x.to(device), y.to(device)
+    assert x.max() < vocab_size, f"x has invalid token: {x.max()} >= {vocab_size}"
+    assert y.max() < vocab_size, f"y has invalid token: {y.max()} >= {vocab_size}"
+
     return x, y
 
 
@@ -124,12 +127,19 @@ class Head(nn.Module):
 
     def __init__(self, head_size):
         super().__init__()
+<<<<<<< HEAD
         self.head_size = head_size
         self.key = LoRALinear(n_embd, head_size, lora_rank, lora_alpha, lora_dropout, bias=False)
         self.query = LoRALinear(n_embd, head_size, lora_rank, lora_alpha, lora_dropout, bias=False)
         self.value = LoRALinear(n_embd, head_size, lora_rank, lora_alpha, lora_dropout, bias=False)
         self.register_buffer('tril', torch.tril(torch.ones(block_size, block_size)))
 
+=======
+        self.key = nn.Linear(n_embd, head_size, bias=False)
+        self.query = nn.Linear(n_embd, head_size, bias=False)
+        self.value = nn.Linear(n_embd, head_size, bias=False)
+        self.register_buffer('tril', torch.tril(torch.ones(2048, 2048)))
+>>>>>>> eb24158 (benchmarks)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
@@ -188,6 +198,7 @@ class Block(nn.Module):
 class GPTLanguageModel(nn.Module):
     def __init__(self, vocab_size):
         super().__init__()
+        self.block_size = block_size
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
         self.position_embedding_table = nn.Embedding(block_size, n_embd)
         self.blocks = nn.Sequential(*[Block(n_embd, n_head=n_head) for _ in range(n_layer)])
